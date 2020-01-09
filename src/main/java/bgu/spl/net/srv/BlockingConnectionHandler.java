@@ -57,7 +57,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
                         protocol.process(nextMessage.toString());
                     }
                 }
-                while (!messageQueue.isEmpty()) {
+                while (!messageQueue.isEmpty()&&connected) {
                     out.write(encdec.encode(messageQueue.poll()));
                     out.flush();
                 }
