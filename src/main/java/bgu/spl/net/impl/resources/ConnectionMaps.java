@@ -58,7 +58,7 @@ public class ConnectionMaps<T> {
         if (Id_TopicMap.containsKey(connectionId)){
             Id_TopicMap.get(connectionId).add(new ImmutablePair<>(subscribeId,topic));
             if (!ChannelMap.containsKey(topic)) {
-                ChannelMap.put(topic, new HashSet<>());
+                ChannelMap.put(topic, ConcurrentHashMap.newKeySet());
             }
             ChannelMap.get(topic).add(Id_ClientMap.get(connectionId));
         }else {
