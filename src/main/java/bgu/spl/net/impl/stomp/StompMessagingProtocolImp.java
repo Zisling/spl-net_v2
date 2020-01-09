@@ -5,12 +5,11 @@ import bgu.spl.net.impl.resources.ConnectionMaps;
 import bgu.spl.net.impl.resources.SharedResources;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
-import bgu.spl.net.srv.ConnectionsImpl;
 
 import java.util.HashMap;
 
 public class StompMessagingProtocolImp implements StompMessagingProtocol {
-    private boolean hasStarted = false;
+    private boolean ConnectedFrameReceived = false;
     private boolean shouldTerminate=false;
     private Connections<String > connections;
     private int connectionId;
@@ -40,7 +39,7 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
             int at = message.indexOf('\n');
             String command = message.substring(0, at);
             String body = message.substring(at+1);
-            if (!hasStarted){
+            if (!ConnectedFrameReceived){
                 if (command.equals("STOMP")||command.equals("CONNECT")){
                     String frameSt = ProcessConnect(body);
                     connections.send(connectionId, frameSt);
@@ -50,7 +49,7 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
                 }
 
 
-                    hasStarted = true;
+                    ConnectedFrameReceived = true;
             }
             else {
 
