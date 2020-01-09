@@ -13,12 +13,18 @@ public class ConnectionMaps<T> {
 
     private AtomicInteger idCounter;
 
-    private ConcurrentHashMap<Integer, ConnectionHandler<T>> Id_ClientMap=new ConcurrentHashMap<>();// a Concurrent Map that maps Client Id to his connection Handler.
+    private ConcurrentHashMap<Integer, ConnectionHandler<T>> Id_ClientMap;// a Concurrent Map that maps Client Id to his connection Handler.
+
+    private ConcurrentHashMap<ConnectionHandler<T>,Integer> ClientMap_Id;
 
     //First Entry of pair is topic subscription id and Second is the topic.
-    private ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Pair<String,String>>> Id_TopicMap=new ConcurrentHashMap<>();// a Concurrent Map that maps Client Id to topics he's subscribed to.
+    private ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Pair<String,String>>> Id_TopicMap;// a Concurrent Map that maps Client Id to topics he's subscribed to.
 
-    private ConcurrentHashMap<String, Set<ConnectionHandler<T>>> ChannelMap=new ConcurrentHashMap<>();// a Concurrent Map that maps a topic to it's subscribed clients.
+    private ConcurrentHashMap<String, Set<ConnectionHandler<T>>> ChannelMap;// a Concurrent Map that maps a topic to it's subscribed clients.
+
+    public ConcurrentHashMap<ConnectionHandler<T>, Integer> getClientMap_Id() {
+        return ClientMap_Id;
+    }
 
     public ConcurrentHashMap<Integer, ConnectionHandler<T>> getId_ClientMap() {
         return Id_ClientMap;
@@ -35,6 +41,7 @@ public class ConnectionMaps<T> {
     public ConnectionMaps() {
         idCounter = new AtomicInteger(0);
         Id_ClientMap = new ConcurrentHashMap<>();
+        ClientMap_Id = new ConcurrentHashMap<>();
         Id_TopicMap = new ConcurrentHashMap<>();
         ChannelMap = new ConcurrentHashMap<>();
     }
@@ -98,6 +105,7 @@ public class ConnectionMaps<T> {
     public void addClientToIdMaps(int connectionId,ConnectionHandler<T> toAdd)
     {
         Id_ClientMap.put(connectionId,toAdd);
+        ClientMap_Id.put(toAdd, connectionId);
         Id_TopicMap.put(connectionId,new ConcurrentLinkedQueue<>());
     }
 
@@ -125,7 +133,8 @@ public class ConnectionMaps<T> {
         int val;
         do {
             val = idCounter.get();
-        }while (idCounter.compareAndSet(val,val+1));
-        return val;
+        }while (!idCounter.compareAndSet(val,val+1));
+        return idCounter.get();
     }
+
 }

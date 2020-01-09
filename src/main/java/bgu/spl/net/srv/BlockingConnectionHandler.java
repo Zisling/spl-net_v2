@@ -25,9 +25,10 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     private volatile boolean connected = true;
     private SharedResources sharedResources;
     private ConnectionMaps connectionMaps;
-    private boolean init =false;
+    private boolean init;
 
     public BlockingConnectionHandler(Socket sock, MessageEncoderDecoder<T> reader, StompMessagingProtocol protocol) {
+        init=false;
         this.sock = sock;
         this.encdec = reader;
         this.protocol = protocol;
@@ -41,7 +42,9 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
         try (Socket sock = this.sock) { //just for automatic closing
             int read;
             if (!init){
+                init= true;
                 int id = connectionMaps.getIdCounter();
+                System.out.println("this is my id  "+ id);
                 connectionMaps.addClientToIdMaps(id,this);
                 protocol.start(id,new ConnectionsImpl<>(connectionMaps));
             }
@@ -55,7 +58,6 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
                     }
                 }
                 while (!messageQueue.isEmpty()) {
-
                     out.write(encdec.encode(messageQueue.poll()));
                     out.flush();
                 }
@@ -69,20 +71,12 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
 
     @Override
     public void close() throws IOException {
-        System.out.println("logout at close");
         connected = false;
         sock.close();
     }
 
     @Override
     public void send(T msg) {
-        try {
-            synchronized (lock){
-                out.write(encdec.encode(msg));
-                out.flush();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            messageQueue.add(msg);
     }
 }

@@ -18,7 +18,7 @@ public class StompServer {
 
 //        if(args[1].equals("tpc"))
 //        {
-        Server.threadPerClient(7777, StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new).serve();
+        Server.threadPerClient(8888, StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new).serve();
 //        }
 
     }

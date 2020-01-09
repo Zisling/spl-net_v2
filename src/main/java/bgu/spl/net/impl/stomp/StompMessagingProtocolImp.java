@@ -29,7 +29,6 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
     public void start(int connectionId, Connections<String> connections) {
         this.connections=connections;
         this.connectionId=connectionId;
-        hasStarted=true;
     }
 
     @Override
@@ -44,6 +43,7 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
             if (!hasStarted){
                 if (command.equals("STOMP")||command.equals("CONNECT")){
                     String frameSt = ProcessConnect(body);
+                    connections.send(connectionId, frameSt);
                 }else {
                     connections.send(connectionId,"ERROR\nmessage:you need to send a CONNECT frame first\n\n");
                     shouldTerminate=true;
@@ -147,8 +147,8 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
             if (keyMap.containsKey("receipt")){
                 connections.send(connectionId, FrameCreator.FrameCreatorReceipt(keyMap.get("receipt")).toString());
                 shouldTerminate=true;
-                sharedResources.logout(userName);
                 connections.disconnect(connectionId);
+                sharedResources.logout(userName);
                 return FrameCreator.emptyFrame();
             }
             else {

@@ -24,7 +24,24 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     @Override
     public void send(String channel, T msg) {
+        String msgStr = msg.toString();
+        if (maps.getChannelMap().containsKey(channel))
+        {
+            for (ConnectionHandler<T> tConnectionHandler : maps.getChannelMap().get(channel)) {
+                String sub = "subscription:";
+                int subIdPos=msgStr.indexOf(sub);
+                subIdPos = msgStr.indexOf(':', subIdPos);
+                int end = msgStr.indexOf('\n', subIdPos);
 
+                String subID = maps.getSubscriptionId(maps.getClientMap_Id().get(tConnectionHandler),channel);
+                String msg2= msgStr.substring(0,subIdPos+1)+subID+msgStr.substring(end);
+                tConnectionHandler.send((T) msg2);
+            }
+        }
+        else
+        {
+            System.out.println("Error:No such Channel exists");
+        }
     }
 
     @Override
