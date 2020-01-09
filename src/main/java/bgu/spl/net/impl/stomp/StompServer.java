@@ -16,8 +16,7 @@ public class StompServer {
             Reactor<String> reactor= new Reactor<>(4, Integer.parseInt(args[0]), StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new);
             reactor.serve();
         }
-
-        if(args[1].equals("tpc"))
+        else if(args[1].equals("tpc"))
         {
         Server.threadPerClient(Integer.parseInt(args[0]), StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new).serve();
         }
