@@ -2,6 +2,9 @@ package bgu.spl.net.srv;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.MessagingProtocol;
+import bgu.spl.net.api.StompMessagingProtocol;
+import bgu.spl.net.impl.resources.ConnectionMaps;
+import bgu.spl.net.impl.resources.SharedResources;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,21 +18,28 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private static final int BUFFER_ALLOCATION_SIZE = 1 << 13; //8k
     private static final ConcurrentLinkedQueue<ByteBuffer> BUFFER_POOL = new ConcurrentLinkedQueue<>();
 
-    private final MessagingProtocol<T> protocol;
+    private final StompMessagingProtocol protocol;
     private final MessageEncoderDecoder<T> encdec;
     private final Queue<ByteBuffer> writeQueue = new ConcurrentLinkedQueue<>();
     private final SocketChannel chan;
     private final Reactor reactor;
+    private SharedResources sharedResources;
+    private ConnectionMaps connectionMaps;
+    private boolean init;
 
     public NonBlockingConnectionHandler(
             MessageEncoderDecoder<T> reader,
-            MessagingProtocol<T> protocol,
+            StompMessagingProtocol protocol,
             SocketChannel chan,
             Reactor reactor) {
+        init=false;
         this.chan = chan;
         this.encdec = reader;
         this.protocol = protocol;
         this.reactor = reactor;
+        sharedResources = SharedResources.getInstance();
+
+        connectionMaps = sharedResources.getConnectionMaps();
     }
 
     public Runnable continueRead() {
@@ -45,18 +55,22 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         if (success) {
             buf.flip();
             return () -> {
+                if (!init){
+                    init= true;
+                    int id = connectionMaps.getIdCounter();
+                    System.out.println("this is my id  "+ id);
+                    connectionMaps.addClientToIdMaps(id,this);
+                    protocol.start(id,new ConnectionsImpl<>(connectionMaps));
+                }
                 try {
                     while (buf.hasRemaining()) {
                         T nextMessage = encdec.decodeNextByte(buf.get());
                         if (nextMessage != null) {
-                            T response = protocol.process(nextMessage);
-                            if (response != null) {
-                                writeQueue.add(ByteBuffer.wrap(encdec.encode(response)));
-                                reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-                            }
+                            protocol.process(nextMessage.toString());
                         }
                     }
-                } finally {
+                }
+                finally {
                     releaseBuffer(buf);
                 }
             };
@@ -118,6 +132,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
     @Override
     public void send(T msg) {
-        //IMPLEMENT IF NEEDED
+        writeQueue.add(ByteBuffer.wrap(encdec.encode(msg)));
+        reactor.updateInterestedOps(chan, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
     }
 }
