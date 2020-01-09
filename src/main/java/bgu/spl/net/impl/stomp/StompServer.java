@@ -13,13 +13,13 @@ public class StompServer {
 
         if(args[1].equals("reactor"))
         {
-            Reactor<String> reactor= new Reactor<>(4, 7777, StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new);
+            Reactor<String> reactor= new Reactor<>(4, Integer.parseInt(args[0]), StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new);
             reactor.serve();
         }
 
         if(args[1].equals("tpc"))
         {
-        Server.threadPerClient(8888, StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new).serve();
+        Server.threadPerClient(Integer.parseInt(args[0]), StompMessagingProtocolImp::new, LineMessageEncoderDecoder::new).serve();
         }
 
     }
