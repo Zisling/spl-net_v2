@@ -33,8 +33,6 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
     @Override
     public void process(String message) {
 
-
-
             FrameCreator frame=null;
             int at = message.indexOf('\n');
             String command = message.substring(0, at);

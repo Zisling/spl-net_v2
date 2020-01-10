@@ -13,30 +13,14 @@ public class ConnectionMaps<T> {
 
     private AtomicInteger idCounter;
 
-    private ConcurrentHashMap<Integer, ConnectionHandler<T>> Id_ClientMap;// a Concurrent Map that maps Client Id to his connection Handler.
+    private ConcurrentHashMap<Integer, ConnectionHandler<T>> Id_ClientMap;// a Concurrent Map that maps Client ID to his connection Handler.
 
-    private ConcurrentHashMap<ConnectionHandler<T>,Integer> ClientMap_Id;
+    private ConcurrentHashMap<ConnectionHandler<T>,Integer> ClientMap_Id;// a Concurrent Map that maps a Connection Handler to it's Client ID.
 
     //First Entry of pair is topic subscription id and Second is the topic.
     private ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Pair<String,String>>> Id_TopicMap;// a Concurrent Map that maps Client Id to topics he's subscribed to.
 
     private ConcurrentHashMap<String, Set<ConnectionHandler<T>>> ChannelMap;// a Concurrent Map that maps a topic to it's subscribed clients.
-
-    public ConcurrentHashMap<ConnectionHandler<T>, Integer> getClientMap_Id() {
-        return ClientMap_Id;
-    }
-
-    public ConcurrentHashMap<Integer, ConnectionHandler<T>> getId_ClientMap() {
-        return Id_ClientMap;
-    }
-
-    public ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Pair<String, String>>> getId_TopicMap() {
-        return Id_TopicMap;
-    }
-
-    public ConcurrentHashMap<String, Set<ConnectionHandler<T>>> getChannelMap() {
-        return ChannelMap;
-    }
 
     public ConnectionMaps() {
         idCounter = new AtomicInteger(0);
@@ -129,6 +113,10 @@ public class ConnectionMaps<T> {
         return null;
     }
 
+    /**
+     * Incerments and returns an Integer representing the ClientID, uses CAS due to idCounter being AtomicInteger.
+     * @return -incremented idCounter.
+     */
     public int getIdCounter() {
         int val;
         do {
@@ -137,4 +125,20 @@ public class ConnectionMaps<T> {
         return idCounter.get();
     }
 
+
+    public ConcurrentHashMap<ConnectionHandler<T>, Integer> getClientMap_Id() {
+        return ClientMap_Id;
+    }
+
+    public ConcurrentHashMap<Integer, ConnectionHandler<T>> getId_ClientMap() {
+        return Id_ClientMap;
+    }
+
+    public ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Pair<String, String>>> getId_TopicMap() {
+        return Id_TopicMap;
+    }
+
+    public ConcurrentHashMap<String, Set<ConnectionHandler<T>>> getChannelMap() {
+        return ChannelMap;
+    }
 }

@@ -7,11 +7,13 @@ public class FrameCreator {
     private String Command;
     private String body;
     private FrameCreator(String Command){
+
         this.Command=Command;
     }
 
 //    for debug
     public static FrameCreator emptyFrame(){
+
         return new FrameCreator("empty");
     }
 
@@ -30,6 +32,7 @@ public class FrameCreator {
         out.setBody("receipt-id:"+zeros+receiptId+'\n'+"\n");
         return out;
     }
+
 //TODO change it so it can change the amount of info
     public static FrameCreator FrameCreatorError(String Id, String reason, String TheMessage, String detailed){
         FrameCreator out = new FrameCreator("ERROR");
@@ -47,24 +50,30 @@ public class FrameCreator {
 
 
     public String toString(){
+
         return getCommand()+'\n'+getBody();
     }
 
     public String getCommand() {
+
         return Command;
     }
 
     public String getBody() {
+
         return body;
     }
 
     public void setCommand(String command) {
+
         Command = command;
     }
 
     public void setBody(String body) {
+
         this.body = body;
     }
+
     private static String idToString(int Id){
         String IdString = id.toString();
         String toAdd="";

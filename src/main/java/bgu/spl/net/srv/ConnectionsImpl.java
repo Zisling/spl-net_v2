@@ -52,6 +52,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
             //removing client from Id topic map and channel map
             ConcurrentLinkedQueue<Pair<String,String>> ListofSubscribedTopicsPairs =maps.getId_TopicMap().get(connectionId);
+
             for (Pair<String,String> aPair: ListofSubscribedTopicsPairs) {
                 maps.getChannelMap().get(aPair.getValue()).remove(ClientToRemove);
             }
