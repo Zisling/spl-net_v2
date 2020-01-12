@@ -13,7 +13,7 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
     private boolean shouldTerminate=false;
     private Connections<String > connections;
     private int connectionId;
-    private ConnectionMaps connectionMaps;
+    private ConnectionMaps<?> connectionMaps;
     private ConnectionHandler handler;
     private String userName;
     private SharedResources sharedResources;
@@ -120,9 +120,17 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
             if (keyMap.containsKey("destination")&&keyMap.get("destination").length()>0){
                 String subId =connectionMaps.getSubscriptionId(connectionId, keyMap.get("destination"));
                 if (subId!=null){
-                out = FrameCreator.FrameCreatorMessage(
-                        subId,keyMap.get("destination"),keyMap.get("body"));
-                connections.send(keyMap.get("destination"), out.toString());
+                String channel = keyMap.get("destination");
+                    for (ConnectionHandler<?> tConnectionHandler : connectionMaps.getChannelMap().get(channel)) {
+                        String sub = "subscription:";
+                        String subIdofClient = connectionMaps.getSubscriptionId(connectionMaps.getClientMap_Id().get(tConnectionHandler),channel);
+                        out = FrameCreator.FrameCreatorMessage(
+                                subIdofClient,keyMap.get("destination"),keyMap.get("body"));
+                        int idOfClient = connectionMaps.getClientMap_Id().get(tConnectionHandler);
+                        connections.send(idOfClient,out.toString());
+                    }
+                    FrameCreator.increase();
+                    System.out.println(out.getBody());
                 return out;
                 }else {
                     return FrameCreator.FrameCreatorError("no id in send","destination don't exist",body,"didn't subscribe to chanel");

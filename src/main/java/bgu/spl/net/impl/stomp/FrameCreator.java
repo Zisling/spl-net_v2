@@ -67,8 +67,6 @@ public class FrameCreator {
     public static FrameCreator FrameCreatorMessage(String subscription, String destination, String body){
         FrameCreator out = new FrameCreator("MESSAGE");
         out.setBody("subscription:"+subscription+"\nmessage-id:"+idToString(id.get())+"\ndestination:"+destination+"\n\n"+body);
-        System.out.println(body);
-        increase();
         return out;
     }
 
@@ -110,7 +108,7 @@ public class FrameCreator {
     /**
      * increase the id of the message
      */
-    private static void increase(){
+    public static void increase(){
         int val;
         do {
             val = id.get();
