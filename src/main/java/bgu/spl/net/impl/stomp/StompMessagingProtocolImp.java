@@ -79,7 +79,11 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
         return shouldTerminate;
     }
 
-
+    /***
+     * Processes a CONNECT Frame.
+     * @param body the entire frame except the Stomp command
+     * @return String that represent the correct answer for the process
+     */
     public String  ProcessConnect(String body){
         if (body!=null&&!body.isEmpty()) {
             HashMap<String ,String > messageMap = cutFrame(body);

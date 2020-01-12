@@ -17,12 +17,22 @@ public class FrameCreator {
         return new FrameCreator("empty");
     }
 
+    /**
+     * crate a FrameCreator that return a Connected
+     * @return out FrameCreator for Connected
+     */
     public static FrameCreator FrameCreatorConnected(){
         FrameCreator out = new FrameCreator("CONNECTED");
         out.setBody("version:1.2"+'\n'+"\n");
         return out;
     }
 
+
+    /**
+     *
+     * @param receiptId that id for the RECEIPT frame
+     * @return out FrameCreator for Receipt frame
+     */
     public static FrameCreator FrameCreatorReceipt(String receiptId){
         FrameCreator out = new FrameCreator("RECEIPT");
         StringBuilder zeros = new StringBuilder();
@@ -33,13 +43,27 @@ public class FrameCreator {
         return out;
     }
 
-//TODO change it so it can change the amount of info
+    /**
+     *
+     * @param Id - the id of the client
+     * @param reason - the reason for the error
+     * @param TheMessage - the message that give the erroe
+     * @param detailed - more info for the problome
+     * @return out FrameCreator for ERROR frame
+     */
     public static FrameCreator FrameCreatorError(String Id, String reason, String TheMessage, String detailed){
         FrameCreator out = new FrameCreator("ERROR");
         out.setBody("receipt-id:"+Id+"\nmessage:"+reason+'\n'+"\nThe message:"+"\n-----\n"+TheMessage+"\n-----\n"+detailed+"\n");
         return out;
     }
 
+    /**
+     *
+     * @param subscription - the id of the subscription
+     * @param destination - the destination of the message
+     * @param body - the body of the frame
+     * @return out FrameCreator for MESSAGE frame
+     */
     public static FrameCreator FrameCreatorMessage(String subscription, String destination, String body){
         FrameCreator out = new FrameCreator("MESSAGE");
         out.setBody("subscription:"+subscription+"\nmessage-id:"+idToString(id.get())+"\ndestination:"+destination+"\n\n"+body);
@@ -83,7 +107,9 @@ public class FrameCreator {
         return toAdd+IdString;
     }
 
-
+    /**
+     * increase the id of the message
+     */
     private static void increase(){
         int val;
         do {
