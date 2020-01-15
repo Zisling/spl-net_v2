@@ -58,7 +58,6 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
                 if (!init){
                     init= true;
                     int id = connectionMaps.getIdCounter();
-                    System.out.println("this is my id  "+ id);
                     connectionMaps.addClientToIdMaps(id,this);
                     protocol.start(id,new ConnectionsImpl<>(connectionMaps));
                 }
