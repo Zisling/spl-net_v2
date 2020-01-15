@@ -69,7 +69,6 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
                 sharedResources.logout(userName);
             }
             else if (frame.getCommand().equals("RECEIPT")){
-                System.out.println(frame.toString());
                 connections.send(connectionId, frame.toString());
             }
         }
@@ -88,7 +87,7 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
     public String  ProcessConnect(String body){
         if (body!=null&&!body.isEmpty()) {
             HashMap<String ,String > messageMap = cutFrame(body);
-            System.out.println(messageMap.get("login")+":"+messageMap.get("passcode"));
+//            System.out.println(messageMap.get("login")+":"+messageMap.get("passcode"));
             if(messageMap.get("accept-version").equals("1.2")&sharedResources.login(messageMap.get("login"),messageMap.get("passcode")))
             {
                 userName=messageMap.get("login");
@@ -97,7 +96,6 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
                 String error;
                 if (sharedResources.isLogin(messageMap.get("login"))){
                     error="ERROR\nmessage:user is already logged in\n\n";
-                    System.out.println(error);
                 }else {
                     error = "ERROR\nmessage: password is incorrect or version isn't compatible\n\n";
                 }
@@ -131,7 +129,6 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
                         connections.send(idOfClient,out.toString());
                     }
                     FrameCreator.increase();
-                    System.out.println(out.getBody());
                 return out;
                 }else {
                     return FrameCreator.FrameCreatorError("no id in send","destination don't exist",body,"didn't subscribe to chanel");
@@ -200,13 +197,10 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
      * @return FrameCreator for the correct response
      */
     public FrameCreator ProcessSubscribe(String body){
-        System.out.println("start subing");
-        System.out.println(body);
         if (body!=null&&!body.isEmpty()) {
             HashMap<String ,String > keyMap = cutFrame(body);
             if (keyMap.containsKey("destination")){
                 if (keyMap.containsKey("id")){
-                    System.out.println("did sub");
                 connectionMaps.addClientToTopic(connectionId, keyMap.get("destination"),keyMap.get("id"));
                 }
                 if (keyMap.containsKey("receipt")){
