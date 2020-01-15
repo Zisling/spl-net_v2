@@ -69,6 +69,7 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
                 sharedResources.logout(userName);
             }
             else if (frame.getCommand().equals("RECEIPT")){
+                System.out.println(frame.toString());
                 connections.send(connectionId, frame.toString());
             }
         }
@@ -178,8 +179,8 @@ public class StompMessagingProtocolImp implements StompMessagingProtocol {
             HashMap<String ,String > keyMap = cutFrame(body);
             if (keyMap.containsKey("id")){
                 connectionMaps.removeClientFromTopic(connectionId, keyMap.get("id"));
-                if (keyMap.containsKey("receipt-id")){
-                    return FrameCreator.FrameCreatorReceipt(keyMap.get("receipt-id"));
+                if (keyMap.containsKey("receipt")){
+                    return FrameCreator.FrameCreatorReceipt(keyMap.get("receipt"));
                 }else {
                     return FrameCreator.emptyFrame();
                 }
